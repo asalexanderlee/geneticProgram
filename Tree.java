@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.Stack;
 
 /*A Tree class that will construct a random Tree object, which will in turn act as an 
  * individual in our population.
@@ -9,6 +10,7 @@ import java.util.Random;
 public class Tree {
 
 	private Node myRoot;
+	private int mySize;
 	
 	/*Constructs a random tree according to user specifications.
 	 * 
@@ -24,6 +26,7 @@ public class Tree {
 		//go ahead and choose random operator for the root
 		//a tree must at least have a root node
 		myRoot = new Node(getRandomData(funcSet), null, null); 
+		mySize = 1;
 		
 		//generate random tree
 		generateRandomTree(myRoot, funcSet, 
@@ -125,6 +128,7 @@ public class Tree {
 			//add nodes as leaves if there aren't already leaves at the max Depth
 			curLeft = new Node(getRandomData(termSet), null, null); 
 			curRight = new Node(getRandomData(termSet), null, null);
+			mySize = mySize + 2;
 			
 			curNode.setLeft(curLeft);
 			curNode.setRight(curRight);
@@ -136,6 +140,8 @@ public class Tree {
 			//is not a leaf), add left and right nodes with random values
 			curLeft = new Node(getRandomData(dataSet), null, null);
 			curRight = new Node(getRandomData(dataSet), null, null);
+			
+			mySize = mySize + 2;
 			
 			curNode.setLeft(curLeft);
 			curNode.setRight(curRight);
@@ -169,6 +175,8 @@ public class Tree {
 			curLeft = new Node(getRandomData(termSet), null, null);
 			curRight = new Node(getRandomData(termSet), null, null);
 			
+			mySize = mySize + 2;
+			
 			curNode.setLeft(curLeft);
 			curNode.setRight(curRight);
 			
@@ -178,6 +186,8 @@ public class Tree {
 			curLeft = new Node(getRandomData(funcSet), null, null);
 			curRight = new Node(getRandomData(funcSet), null, null);
 			
+			mySize = mySize + 2;
+			
 			curNode.setLeft(curLeft);
 			curNode.setRight(curRight);
 			
@@ -185,40 +195,70 @@ public class Tree {
 			generateFullTree(curRight, funcSet, termSet, maxDepth-1);
 		}	
 	}
-
-	/*private Node findReplacePosPar(Node curNode, Node replacePos){
-			if (curNode.getLeft().equals(replacePos)){
-				System.out.println(curNode.getLeft().getNum() + " is the same as " + replacePos.getNum());
-				return curNode;
-			}
-			if (curNode.getRight().equals(replacePos)){
-				return curNode;
-			}
-		
-		if (curNode.getLeft() != null){
-			findReplacePosPar(curNode.getLeft(), replacePos);
+	
+	/*Returns a random node in the current tree.
+	 * 
+	 * Parameters:
+	 * 		root - a Node representing the root
+	 * 		point - the placement of the random node 
+	 * Return:
+	 * 		ans - the random Node we wish to change
+	 */
+	private Node findPoint(Node root, int point){
+		if (point == 0){
+			return root;
 		}
-		if (curNode.getRight() != null){
-			findReplacePosPar(curNode.getRight(), replacePos);
+		Stack<Node> curNodes = new Stack<Node>();
+		curNodes.push(root);
+		boolean found = false;
+		Node ans = null;
+		
+		while (!found){
+			
+			int curSize = curNodes.size();
+			for (int i = 0; i < curSize; i++){
+				if (point == 0){
+					ans = curNodes.pop();
+					found = true;
+				}else{
+					Node poppedNode = curNodes.pop();
+					if (point == 1){
+						ans = poppedNode.getLeft();
+					}
+					else if (poppedNode.getLeft() != null){
+						curNodes.push(poppedNode.getLeft());
+						point--;
+					}
+					if (poppedNode.getRight() != null){
+						curNodes.push(poppedNode.getRight());
+						point--;
+					}
+				}
+			}
 		}
 		
-		return null;
+		return ans;
 	}
-	public Tree(Tree tree1, Tree tree2, Node replacePos){
-		Node parent = findReplacePosPar(tree1.getRoot(), replacePos);
-		if (parent == null){
-			System.out.println("Problem");
-		}
-		if (parent.getLeft().equals(replacePos)){
-			parent.setLeft(tree2.getRoot());
-		}
-		else{
-			parent.setRight(tree2.getRoot());
+	
+	/*Mutates a random node in the current tree by replacing a number/variable with
+	 * a number/variable or an operator with an operator
+	 * 
+	 * Parameters:
+	 * 		termSet - a String[] containing the possible terminal data
+	 * 		funcSet - a String[] containing the possible operators
+	 */
+	public void mutate(String[] termSet, String[] funcSet){
+		Random rand = new Random();
+		int randNum = rand.nextInt(mySize);
+		Node randNode = findPoint(myRoot, randNum);
+		if (stringIsDigit(randNode.getData())){
+			randNode.setData(getRandomData(termSet));
+		}else{
+			randNode.setData(getRandomData(funcSet));
 		}
 	}
 	
-
-	*/private void strHelper(Node curNode, String space){
+	private void strHelper(Node curNode, String space){
 		
 		if (curNode == null){
 			return;

@@ -25,6 +25,10 @@ public class Node {
 		return myData;
 	}
 	
+	public void setData(String data){
+		myData = data;
+	}
+	
 	//A getter for the left child; null if there is no left child
 	public Node getLeft(){
 		return myLeft;
