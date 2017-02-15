@@ -21,19 +21,32 @@ public class main {
 		int maxDepth = 2;
 		String method = "grow";
 		Tree test = new Tree(possOperators, ints, maxDepth, method);
-		test.str();
+		//test.str();
 		test.mutate(ints, possOperators);
 		
 		population = initializePop(possOperators, ints, maxDepth);
+		List<Double> xValues = new ArrayList<Double>();
+		List<Double> yValues = new ArrayList<Double>();
+		for (int i = 0; i < 4; i++){
+			population[i].printPostOrder();
+			System.out.println();
+		}
+		System.out.println();
+		readCSV(xValues,yValues);
+		call(xValues,yValues,possOperators,ints);
+		for (int i = 0; i < 4; i++){
+			population[i].printPostOrder();
+			System.out.println();
+		}
 		
-		//initialize population with 4 random trees //Ash
 		
-		//check fitness to see if they work
-		//best variable to compare fitness  //Al
-		//tournament to choose 2 most fit trees and crossover //Al
-		//function that returns crossover 90% of the time, mutation 10% //L
-		//bloat,etc //L
-		//run until find answer
+	}
+	
+	public static String createSymbReg(){
+		
+		while (true){
+			
+		}
 	}
 	
 	public static Tree[] initializePop(String[] ops, String[] ints, int depth){
@@ -48,6 +61,32 @@ public class main {
 		}
 		
 		return pop;
+	}
+	
+	public static void call(List<Double> xValues, List<Double> yValues,String[] termSet, String[] funcSet){
+		double[] probDis = getProbDistribution(xValues,yValues, population);
+		Tree[] newPop = new Tree[4];
+		for (int i = 0; i < population.length; i++){
+		Random rand = new Random();  
+		double prob = rand.nextDouble(); 
+		if (prob < .10){
+			Tree child = (chooseRandTree(probDis,population)).treeCopy();
+		    child.mutate(termSet,funcSet);
+		    newPop[i] = child;
+		    System.out.println("Mutation");
+			//Tree child = Mutation();
+		}
+		else{
+			Tree child = crossover(probDis,population);
+			newPop[i] = child;
+			System.out.println("Crossover");
+			//Tree child = new Tree; 
+			//child = Crossover(); 
+		}
+		//Tree[].add(child) 
+		}
+		population = newPop;
+		
 	}
   
   public static String FILENAME = "dataset1.csv";
@@ -150,7 +189,7 @@ public class main {
    */
   public static Tree chooseRandTree(double[] distribution, Tree[] trees){
     double r = new Random().nextDouble();
-    for (int i = 0; i < distribution.length - 1; i++){
+    for (int i = 0; i < distribution.length; i++){
       if (r <= distribution[i]){
         return trees[i];
       }
@@ -173,6 +212,7 @@ public class main {
    */
   public static Tree reproduce(Tree tree1, Tree tree2){
     Tree tree1Copy = tree1.treeCopy();
+    if (tree2 == null) System.out.println("know");
     Tree tree2Copy = tree2.treeCopy();
     //select tree1 one crossover point
     //select terminal node as crossover with 10 percent probability. o\w pick function
@@ -214,21 +254,13 @@ public class main {
   public static Tree crossover(double[] distribution, Tree[] trees){
     Tree tree1 = chooseRandTree(distribution, trees);
     Tree tree2 = chooseRandTree(distribution, trees);
+    if (tree2 == null) System.out.println("Null1");
     while (tree1.equals(tree2)){
       tree2 = chooseRandTree(distribution,trees);
+      if (tree2 == null) System.out.println("Null2");
     }
     return reproduce(tree1, tree2);
     
   }
-  
-  
-  
- private static String[] getIntArray(int numInt){
-  String[] intArray = new String[numInt];
-  for (int i = 1; i < numInt+1; i++){
-   intArray[i-1] = i + "";
-  }
-  return intArray;
- }
 	
 }

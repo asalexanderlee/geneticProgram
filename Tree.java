@@ -34,6 +34,11 @@ public class Tree {
 		
 	}
 	
+	public Tree(Node root){
+		myRoot = root;
+		mySize = 1;
+	}
+	
 	/*Takes a String[] and returns a random element from the array. 
 	 * 
 	 * Parameters:
