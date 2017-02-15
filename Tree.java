@@ -1,5 +1,4 @@
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 /*A Tree class that will construct a random Tree object, which will in turn act as an 
  * individual in our population.
@@ -8,6 +7,7 @@ import java.util.Stack;
  * */
 
 public class Tree {
+
 
 	private Node myRoot;
 	private int mySize;
@@ -258,6 +258,69 @@ public class Tree {
 		}
 	}
 	
+  //prints tree in preorder traversal
+ public void printPostOrder(){
+   post(myRoot);
+ }
+ //printPostOrder helper
+ public void post(Node node){
+   if (node == null) return;
+   post(node.getLeft());
+   post(node.getRight());
+   System.out.print(node.getData() + " ");
+ }
+ 
+ //two given two operands and one operator, performs operation. Returns -1 if operand isn't found
+ private double operate(double first, double second, String op){
+   if (op.equals("+")){
+     return first + second;
+   }
+   if (op.equals("-")){
+     return first - second;
+   }
+   if (op.equals("*")){
+     return first * second;
+   }
+   if (op.equals("/")){
+     return first / second;
+   }
+   return -1;
+   
+   
+ }
+ 
+ 
+ 
+ //computes Y values given x value and tree function
+ public double getY(double x){
+   LinkedList<Double> nums = new LinkedList<Double>();
+   getY(myRoot,nums,x);
+   return nums.remove();
+ }
+ //getY helper
+ //uses postorder traversal to make computations
+ private void getY(Node node, LinkedList<Double> nums, double x){
+     if (node == null) return;
+     getY(node.getLeft(),nums,x);
+     getY(node.getRight(),nums,x);
+     String data = node.getData();
+     
+     if (stringIsDigit(data)){
+       
+       nums.add((double) Integer.parseInt(data));
+       
+     }
+     else if (data.equals("X")){
+       nums.add((double) x);
+     }
+     else {
+       double last = nums.removeLast();
+       double secondToLast = nums.removeLast();
+       nums.add(operate(secondToLast, last, data));
+     }
+     
+     
+ }
 	private void strHelper(Node curNode, String space){
 		
 		if (curNode == null){
@@ -273,9 +336,88 @@ public class Tree {
 		strHelper(myRoot, "");
 	}
 	
-	
 
-	public Node getRoot(){
-		return myRoot;
-	}
+
+ public Node getRoot(){
+  return myRoot;
+ }
+ 
+
+ public boolean equals(Object obj){
+   if (!(obj instanceof Tree)){
+            return false;
+   }
+   if (obj == this){
+       return true;
+   }
+   return equalsHelper(((Tree) obj).getRoot(), myRoot);
+   
+ }
+ 
+ 
+ //return copy of tree
+ public Tree treeCopy(){
+   return new Tree(treeCopy(myRoot));
+ }
+ 
+ //treeCopy helper
+ public Node treeCopy(Node node){
+    if (node == null) return null;
+    Node copy = new Node(node.getData());
+    copy.setLeft(treeCopy(node.getLeft()));
+    copy.setRight(treeCopy(node.getRight()));
+    return copy;
+    
+ }
+ 
+ //gets crossover point of a tree. type determines if point is a terminal node or a function node. Chooses node using a uniform probability
+ public Node getCross(String type){
+    List<Node> nodes = new ArrayList<Node>();
+    getNodes(nodes,type, myRoot);
+    double[] distribution = new double[nodes.size()];
+    double sectionSize = 1.0 / distribution.length;
+    //creates probability array. Each node has equal chance of being chosen
+    for (int i = 1; i <= distribution.length; i++){
+       distribution[i - 1] = i * sectionSize;
+    }
+    double r = new Random().nextDouble();
+    for (int i = 0; i < distribution.length; i++){
+      if (r < distribution[i]){
+        return nodes.get(i);
+      }
+    }
+    return null;
+    
+   
+ }
+ 
+ //get nodes helper
+ private void getNodes(List<Node> nodes, String type, Node node){
+    if (node == null) return;
+    if (stringIsDigit(node.getData()) && type == "terminal"){
+      nodes.add(node);
+    }
+    if (!stringIsDigit(node.getData()) && type == "function"){
+      nodes.add(node);
+    }
+    getNodes(nodes, type, node.getLeft());
+    getNodes(nodes, type, node.getRight());
+   
+ }
+ 
+ 
+ 
+ //equals helper
+ private boolean equalsHelper(Node other, Node thisNode){
+   if (other == null && thisNode == null) return true;
+   if ((other == null && thisNode != null) || (other != null && thisNode == null) || other.getData() != thisNode.getData()){
+     return false;
+   }
+   
+   return (equalsHelper(other.getLeft(), thisNode.getLeft()) && equalsHelper(other.getRight(), thisNode.getRight()));
+   
+ }
+ 
+ 
 }
+ 
