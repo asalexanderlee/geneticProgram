@@ -2,7 +2,6 @@
 /*The public class that defines the object Node, which will be either an internal node or a leaf node.*/
 
 public class Node {
-
  private String myData; //will be null when it is a leaf node
  private Node myLeft; //will be null when it is a leaf node
  private Node myRight; //ditto
